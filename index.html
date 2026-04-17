@@ -167,9 +167,47 @@
         .tilt-wrapper { perspective: 1000px; }
         .tilt-element { transition: transform 0.1s ease; transform-style: preserve-3d; }
         .tilt-inner { transform: translateZ(30px); }
+
+        /* Custom Cursor */
+        body, a, button, input, textarea {
+            cursor: none !important;
+        }
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 99999;
+            pointer-events: none;
+        }
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #00f3ff;
+            box-shadow: 0 0 10px #00f3ff;
+        }
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(176, 38, 255, 0.5);
+            box-shadow: 0 0 15px rgba(176, 38, 255, 0.3);
+            transition: width 0.3s, height 0.3s, background-color 0.3s, border-color 0.3s;
+        }
+        .cursor-hover .cursor-outline {
+            width: 60px;
+            height: 60px;
+            background-color: rgba(0, 243, 255, 0.1);
+            border-color: #00f3ff;
+            box-shadow: 0 0 20px rgba(0, 243, 255, 0.4);
+        }
     </style>
 </head>
 <body class="antialiased selection:bg-neon-cyan selection:text-dark">
+
+    <!-- Custom Cursor Elements -->
+    <div class="cursor-dot" id="cursor-dot"></div>
+    <div class="cursor-outline" id="cursor-outline"></div>
 
     <!-- Loading Screen -->
     <div id="loader">
@@ -875,6 +913,37 @@
                 elements.forEach(el => {
                     el.style.transform = `rotateX(0deg) rotateY(0deg)`;
                 });
+            });
+        });
+
+        // --- 6. Custom Cursor Logic ---
+        const cursorDot = document.getElementById('cursor-dot');
+        const cursorOutline = document.getElementById('cursor-outline');
+
+        window.addEventListener('mousemove', (e) => {
+            const posX = e.clientX;
+            const posY = e.clientY;
+
+            // Instant follow for dot
+            gsap.set(cursorDot, { left: posX, top: posY });
+            
+            // Smooth trailing follow for outline
+            gsap.to(cursorOutline, {
+                left: posX,
+                top: posY,
+                duration: 0.15,
+                ease: "power2.out"
+            });
+        });
+
+        // Hover effects for interactive elements
+        const interactives = document.querySelectorAll('a, button, input, textarea, .glass-card');
+        interactives.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                document.body.classList.add('cursor-hover');
+            });
+            el.addEventListener('mouseleave', () => {
+                document.body.classList.remove('cursor-hover');
             });
         });
 
